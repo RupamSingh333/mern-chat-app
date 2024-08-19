@@ -5,6 +5,8 @@ const useConversation = create((set) => ({
 	setSelectedConversation: (selectedConversation) => set({ selectedConversation }),
 	messages: [],
 	setMessages: (messages) => set({ messages }),
+	isUserOnline: false,
+	setIsUserOnline: (isUserOnline) => set({ isUserOnline }),
 }));
 
 export default useConversation;

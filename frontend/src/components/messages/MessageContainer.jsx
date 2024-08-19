@@ -1,5 +1,7 @@
 import { useEffect } from "react";
 import useConversation from "../../zustand/useConversation";
+import { useSocketContext } from "../../context/SocketContext";
+
 import MessageInput from "./MessageInput";
 import Messages from "./Messages";
 import { TiMessages } from "react-icons/ti";
@@ -7,12 +9,23 @@ import { FaTimes } from "react-icons/fa";  // Importing close icon
 import { useAuthContext } from "../../context/AuthContext";
 
 const MessageContainer = () => {
-  const { selectedConversation, setSelectedConversation } = useConversation();
+
+  const { selectedConversation, setSelectedConversation, isUserOnline, setIsUserOnline } = useConversation();
+  const { onlineUsers } = useSocketContext();
+
+
+  useEffect(() => {
+    return () => setSelectedConversation(null);
+  }, [setSelectedConversation]);
 
   useEffect(() => {
     // cleanup function (unmounts)
-    return () => setSelectedConversation(null);
-  }, [setSelectedConversation]);
+    if (selectedConversation) {
+      const isOnline = onlineUsers.includes(selectedConversation._id);
+      setIsUserOnline(isOnline);
+    }
+
+  }, [selectedConversation]);
 
   const closeConversation = () => {
     setSelectedConversation(null);
@@ -29,9 +42,20 @@ const MessageContainer = () => {
             <div>
               <span className='label-text'>To:</span>{" "}
               <span className='text-gray-900 font-bold'>{selectedConversation.fullName}</span>
+              <span
+                style={{
+                  display: "inline-block",
+                  width: "10px",
+                  height: "10px",
+                  borderRadius: "50%",
+                  backgroundColor: isUserOnline ? "green" : "red",
+                  marginLeft: "8px",
+                }}
+                title={isUserOnline ? "Online" : "Offline"}
+              ></span>
             </div>
-            <FaTimes 
-              className='text-white cursor-pointer' 
+            <FaTimes
+              className='text-white cursor-pointer'
               onClick={closeConversation}  // Handle close icon click
             />
           </div>
